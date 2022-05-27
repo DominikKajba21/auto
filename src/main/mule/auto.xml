@@ -10,6 +10,6 @@ http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/htt
 	<flow name="autoFlow" doc:id="ef750669-6cf6-4627-b274-215596fd7ec0" >
 		<http:listener doc:name="Listener" doc:id="16b7c2fd-5dbf-4a7c-bb71-fba68d1e37ba" config-ref="HTTP_Listener_config" path="/tzgrgr"/>
 		<set-payload value="#[payload]" doc:name="Set Payload" doc:id="85263973-569b-46f5-9788-c357ae77072a" />
-		<set-payload value='#["ovo je promjena!"]' doc:name="Set Payload" doc:id="5fe2d2de-c169-4ca5-b12d-dd18eee5c548" />
+		<set-payload value='#["ovo je promjena!"jhkjhčuhgiuzčgizčgflzgf7zgiuz]' doc:name="Set Payload" doc:id="5fe2d2de-c169-4ca5-b12d-dd18eee5c548" />
 	</flow>
 </mule>
