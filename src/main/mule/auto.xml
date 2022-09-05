@@ -1,15 +1,40 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<mule xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core"
-	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+<mule xmlns:db="http://www.mulesoft.org/schema/mule/db" xmlns:sftp="http://www.mulesoft.org/schema/mule/sftp"
+	xmlns:netsuite="http://www.mulesoft.org/schema/mule/netsuite"
+	xmlns:batch="http://www.mulesoft.org/schema/mule/batch" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/batch http://www.mulesoft.org/schema/mule/batch/current/mule-batch.xsd
+http://www.mulesoft.org/schema/mule/netsuite http://www.mulesoft.org/schema/mule/netsuite/current/mule-netsuite.xsd
+http://www.mulesoft.org/schema/mule/sftp http://www.mulesoft.org/schema/mule/sftp/current/mule-sftp.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
 	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="2ad50afe-7277-4940-bdd8-bb227dc80776" >
 		<http:listener-connection host="0.0.0.0" port="8081" />
 	</http:listener-config>
+	<flow name="autoFlow1" doc:id="4eb2f414-3c67-470d-89d9-35940a9de663" >
+		<http:listener doc:name="Listener" doc:id="fc8e1b44-32e0-45b4-8e42-6cd7eda402a7" config-ref="HTTP_Listener_config" path="/scatter"/>
+		<set-payload value="#[22]" doc:name="Originalni Payload" doc:id="07b9e204-e2ba-40ae-9a3a-2844bba19c64" />
+		<set-variable value="" doc:name="subFlowPayload" doc:id="6d837f3f-c554-45bf-b85c-d74bb19822b5" variableName="subFlowPayload"/>
+		<flow-ref doc:name="Flow Reference" doc:id="53fce79e-5815-4652-ab07-327199401676" name="autoSub_Flow" target="subFlowPayload"/>
+		<logger level="INFO" doc:name="Logger" doc:id="68713c37-a1b7-4185-8d52-82848607a9d9" message="#[vars.subFlowPayload]"/>
+	</flow>
+	<sub-flow name="autoSub_Flow" doc:id="21036195-3ae1-4598-a9da-97f7895de0bc" >
+		<set-payload value="#[1000]" doc:name="Set Payload" doc:id="036aaadd-a099-4556-949e-d318c8e43ebc" />
+	</sub-flow>
 	<flow name="autoFlow" doc:id="ef750669-6cf6-4627-b274-215596fd7ec0" >
-		<http:listener doc:name="Listener" doc:id="16b7c2fd-5dbf-4a7c-bb71-fba68d1e37ba" config-ref="HTTP_Listener_config" path="/tzgrgr"/>
-		<set-payload value="#[payload]" doc:name="Set Payload" doc:id="85263973-569b-46f5-9788-c357ae77072a" />
-		<set-payload value='#["ovo je promjena!"]' doc:name="Set Payload" doc:id="5fe2d2de-c169-4ca5-b12d-dd18eee5c548" />
+		<set-payload value="#[[1,2,3,4,5,6,7]]" doc:name="Set Payload" doc:id="32847afe-b23f-4924-bb7d-ebc112589f49" />
+		<batch:job jobName="autoBatch_Job" doc:id="e97794e0-f18c-4e7b-9dc8-505bbf76fd85" >
+			<batch:process-records >
+				<batch:step name="Batch_Step" doc:id="59eab1c5-5fba-474f-886f-d8b7d9488610" >
+					<set-payload value="#[payload + 1]" doc:name="Set Payload" doc:id="45b103fc-5038-44c5-ada1-30a85d2fecf5" />
+					<batch:aggregator doc:name="Batch Aggregator" doc:id="d3ef89ea-aa31-4e00-808e-735d60fc8508" size="2">
+						<logger level="INFO" doc:name="Logger" doc:id="3dfd8a59-c378-489d-bd55-cacf8a13052b" message="#[payload]"/>
+					</batch:aggregator>
+				</batch:step>
+			</batch:process-records>
+			<batch:on-complete >
+				<logger level="INFO" doc:name="Logger" doc:id="d916368c-99d6-42bf-a975-501df3e02289" message='#[%dw 2.0&#10;output application/json&#10;---&#10;"zadnji logger!"]'/>
+			</batch:on-complete>
+		</batch:job>
 	</flow>
 </mule>
